@@ -1,13 +1,13 @@
 {
-  "name": "scratch-blocks",
-  "version": "0.1.0",
+  "name": "demo-scratch-gui",
+  "version": "1.0.0",
   "description": "Scratch Blocks is a library for building creative computing interfaces.",
   "author": "Massachusetts Institute of Technology",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/LLK/scratch-blocks#readme",
+  "homepage": "https://github.com/yutucc/demo-scratch-gui#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LLK/scratch-blocks.git"
+    "url": "https://github.com/yutucc/demo-scratch-gui.git"
   },
   "main": "./dist/vertical.js",
   "browser": "./shim/vertical.js",

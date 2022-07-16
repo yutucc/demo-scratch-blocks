@@ -113,6 +113,20 @@ Blockly.clipboardSource_ = null;
 Blockly.cache3dSupported_ = null;
 
 /**
+ * 当前角色
+ * @type {Blockly.Role}
+ */
+Blockly.role = new Blockly.Role();
+
+/**
+  * 设置当前角色
+  * @param {String} role 角色
+  */
+Blockly.setRole = function(role) {
+  Blockly.role = new Blockly.Role(role);
+};
+
+/**
  * Convert a hue (HSV model) into an RGB hex triplet.
  * @param {number} hue Hue on a colour wheel (0-360).
  * @return {string} RGB code, e.g. '#5ba65b'.

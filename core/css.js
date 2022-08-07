@@ -1018,6 +1018,30 @@ Blockly.Css.CONTENT = [
     'pointer-events: none;',
   '}',
 
+  /* 显示、隐藏 flyout 的按钮 */
+  '.blocklyToolboxTrigger {',
+    'display: flex;',
+    'justify-content: center;',
+    'align-items: center;',
+
+    'position: absolute;',
+    'top: 0;',
+    'left: 0;',
+    'z-index: 20;',
+
+    'width: 0;',
+    'height: 100%;',
+  '}',
+  '.blocklyToolboxTriggerIcon {',
+    'display: block;',
+    'position: absolute;',
+
+    'width: 26px;',
+    'height: 54px;',
+
+    'cursor: pointer;',
+  '}',
+
   /* Copied from: goog/css/menu.css */
   /*
    * Copyright 2009 The Closure Library Authors. All Rights Reserved.

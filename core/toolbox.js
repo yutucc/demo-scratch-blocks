@@ -82,6 +82,26 @@ Blockly.Toolbox = function(workspace) {
    */
   this.toolboxPosition = workspace.options.toolboxPosition;
 
+  /**
+   * 控制是否隐藏侧边积木选择区域（即：flyout）
+   * @type {boolean} true：隐藏 flyout；false：显示 flyout
+   * @private
+   */
+  this.isHideFlyout_ = false;
+
+  /**
+   * 显示、隐藏 flyout 的按钮
+   * @type {goog.dom}
+   * @private
+   */
+  this.triggerIcon_ = null;
+
+  /**
+   * 显示可删除区域的垃圾桶标识
+   * @type {goog.dom}
+   * @private
+   */
+  this.trash_ = null;
 };
 
 /**
@@ -134,6 +154,86 @@ Blockly.Toolbox.prototype.init = function() {
   this.categoryMenu_ = new Blockly.Toolbox.CategoryMenu(this, this.HtmlDiv);
   this.populate_(workspace.options.languageTree);
   this.position();
+
+  this.createTrigger(); // 创建隐藏 flyout 的按钮
+
+  // 给 “显示、隐藏 flyout 的按钮” 添加点击事件
+  // FIXME: 不知道为什么，这里如果换成绑定 mousedown 事件的话，在移动端会无法点击，也无法执行回调函数
+  Blockly.bindEventWithChecks_(this.triggerIcon_, 'click', this, function() {
+    if (this.isHideFlyout_) {
+      // 当前 this.isHideFlyout_ 是 true，点击后会变成 false，即点击后 flyout 从隐藏状态变成显示状态
+      this.scrollToCategoryById(this.getSelectedCategoryId()); // flyout 处于隐藏状态时切换角色，侧边栏会重置成选择第一种积木类型，所以要执行这个函数，将其滚动到对应位置
+      this.showAll_(); // 展示 flyout
+
+      this.foldTrigger() // 修改 this.triggerIcon_ 的图标和位置
+    } else {
+      this.flyout_.hide(); // 隐藏 flyout
+
+      this.unfoldTrigger(); // 修改 this.triggerIcon_ 的图标和位置
+    }
+
+    this.triggerIsHideFlyout(); // 修改 this.isHideFlyout_ 的值
+
+    /* 这一步有点取巧，目的是在修改this.isHideFlyout_ 的值的同时，
+    调整当前积木可删除区域的计算位置，从而实现积木拖动到指定区域才能删除的效果
+    这一步要结合下面 getClientRect 函数中的计算判断才有效果 */
+    this.workspace_.resize();
+  });
+};
+
+/**
+ * 显示、隐藏 flyout 的按钮
+ */
+ Blockly.Toolbox.prototype.createTrigger = function() {
+  var trigger = goog.dom.createDom(goog.dom.TagName.DIV, 'blocklyToolboxTrigger');
+  var triggerIcon = goog.dom.createDom(goog.dom.TagName.IMG, 'blocklyToolboxTriggerIcon');
+
+  triggerIcon.setAttribute('src', Blockly.mainWorkspace.options.pathToMedia + 'hide.svg');
+  triggerIcon.style.right = '-337px';
+  trigger.appendChild(triggerIcon);
+  this.HtmlDiv.parentNode.insertBefore(trigger, this.HtmlDiv);
+
+  this.triggerIcon_ = triggerIcon;
+};
+
+/**
+ * 修改 this.triggerIcon_ 的图标和位置
+ * https://res.miaocode.com/slim/Snipaste_2022-06-16_11-24-09-1655349874818.png
+ */
+Blockly.Toolbox.prototype.unfoldTrigger = function() {
+  this.triggerIcon_.style.right = '-86px';
+  this.triggerIcon_.setAttribute('src', Blockly.mainWorkspace.options.pathToMedia + 'show.svg');
+};
+
+/**
+ * 修改 this.triggerIcon_ 的图标和位置
+ * https://res.miaocode.com/slim/Snipaste_2022-06-16_11-24-21-1655349884215.png
+ */
+Blockly.Toolbox.prototype.foldTrigger = function() {
+  this.triggerIcon_.style.right = '-337px';
+  this.triggerIcon_.setAttribute('src', Blockly.mainWorkspace.options.pathToMedia + 'hide.svg');
+};
+
+/**
+ * 获取当前 this.isHideFlyout_ 的值
+ * @returns {boolean}
+ */
+Blockly.Toolbox.prototype.getIsHideFlyout = function() {
+  return this.isHideFlyout_;
+};
+
+/**
+ * 设置 this.isHideFlyout_ 的值
+ */
+Blockly.Toolbox.prototype.setIsHideFlyout = function(isHideFlyout_) {
+  this.isHideFlyout_ = isHideFlyout_;
+};
+
+/**
+ * 触发 this.isHideFlyout_ 的改变
+ */
+Blockly.Toolbox.prototype.triggerIsHideFlyout = function() {
+  this.isHideFlyout_ = !this.isHideFlyout_;
 };
 
 /**
@@ -185,7 +285,10 @@ Blockly.Toolbox.prototype.createFlyout_ = function() {
 Blockly.Toolbox.prototype.populate_ = function(newTree) {
   this.categoryMenu_.populate(newTree);
   this.showAll_();
-  this.setSelectedItem(this.categoryMenu_.categories_[0], false);
+  // this.setSelectedItem(this.categoryMenu_.categories_[0], false);
+
+  // 原本这里调用的是 setSelectedItem 函数，因为 setSelectedItem 添加了点击 category 配合 this.isHideFlyout_ 的逻辑，所以额外再开一个函数
+  this.setSelectedItemForPopulate(this.categoryMenu_.categories_[0], false); // 不设置默认值的话会有问题
 };
 
 /**
@@ -296,7 +399,12 @@ Blockly.Toolbox.prototype.getClientRect = function() {
   }
 
   // If not an auto closing flyout, always use the (larger) flyout client rect
-  if (!this.flyout_.autoClose) {
+  /* 这一步跟 core/workspace_svg.js 中的 recordDeleteAreas_ 函数有关
+  目的是为了计算出当前积木可删除区域的位置
+  结合 this.isHideFlyout_ 的变化，实现下图交互：
+      https://tva1.sinaimg.cn/large/b3cc33a0gy1h4y7yumu1tj20ye16kk62.jpg
+      https://tva1.sinaimg.cn/large/b3cc33a0gy1h4y7z7018ij20vc15w7dd.jpg */
+  if (!this.flyout_.autoClose && !this.isHideFlyout_) {
     return this.flyout_.getClientRect();
   }
 
@@ -454,6 +562,55 @@ Blockly.Toolbox.prototype.setSelectedItem = function(item, opt_shouldScroll) {
     if (opt_shouldScroll) {
       this.scrollToCategoryById(categoryId);
     }
+
+    // 在点击 category 时，如果 flyout 处于隐藏状态，则需要修改为显示状态
+    // 原本 setSelectedItem 函数没有这个 if 中的逻辑，是自己新加的
+    if (this.isHideFlyout_) {
+      this.showAll_();
+
+      this.foldTrigger();
+
+      this.setIsHideFlyout(false);
+      this.workspace_.resize();
+    }
+  }
+};
+
+/**
+ * copy 原本 setSelectedItem 的逻辑，并加了一个 this.isHideFlyout_ 逻辑
+ */
+ Blockly.Toolbox.prototype.setSelectedItemForPopulate = function(item, opt_shouldScroll) {
+  if (typeof opt_shouldScroll === 'undefined') {
+    opt_shouldScroll = true;
+  }
+  if (this.selectedItem_) {
+    // They selected a different category but one was already open.  Close it.
+    this.selectedItem_.setSelected(false);
+  }
+  this.selectedItem_ = item;
+  if (this.selectedItem_ != null) {
+    this.selectedItem_.setSelected(true);
+
+    // Scroll flyout to the top of the selected category
+    var categoryId = item.id_;
+    if (opt_shouldScroll) {
+      this.scrollToCategoryById(categoryId);
+    }
+  }
+
+  /* 这里又有点取巧
+  本来当切换角色时，会重新执行 populate_ 函数，并且重新把 flyout 显示出来
+  在这里加多一个判断 this.isHideFlyout_ 状态，如果是true，则再次将其隐藏起来
+  PS：
+      看到这里一定会好奇，为什么不直接在 populate_ 函数上判断 this.isHideFlyout_？
+      确实，一开始也是在 populate_ 函数中加判断逻辑的，但最后发现，如果在 populate_ 函数中加判断实现下面 if 中类似的效果时，会有 bug：
+          1. 当在角色上将 this.isHideFlyout_ 变成 true，然后切换到背景，然后点击 category，则积木块定位会不准
+          2. 当在背景上将 this.isHideFlyout_ 变成 true，然后切换到角色，然后点击 category，则积木块定位会不准
+          3. 神奇的是，当在角色上将 this.isHideFlyout_ 变成 true，然后切换到另一个角色，然后点击 category，则积木块定位居然是准确的
+      百思不得其解后，才采用现在这个方案：populate_ 函数的逻辑不改，在这里增加多一个判断 */
+  if (this.isHideFlyout_) {
+    this.flyout_.hide();
+    this.workspace_.resize();
   }
 };
 

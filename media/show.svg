@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="54px" viewBox="0 0 26 54" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>展开收起</title>
+    <defs>
+        <polygon id="path-1" points="-3.62944968e-14 1.27398092e-14 26 -8.299611e-14 26 54 2.3543667e-13 54"></polygon>
+        <path d="M-1,7 L11,7 C15.418278,7 19,10.581722 19,15 L19,39 C19,43.418278 15.418278,47 11,47 L-1,47 L-1,47 L-1,7 Z" id="path-3"></path>
+        <filter x="-40.0%" y="-25.0%" width="200.0%" height="150.0%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="2" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.326104423   0 0 0 0 0.664346077   0 0 0 0 0.812783062  0 0 0 0.06 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="创作中心" transform="translate(-595.000000, -474.000000)">
+            <g id="展开收起" transform="translate(595.000000, 474.000000)">
+                <g id="矩形">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="蒙版"></g>
+                    <g mask="url(#mask-2)">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <path stroke="#AEE2F3" stroke-width="1" d="M11,7.5 C13.0710678,7.5 14.9460678,8.33946609 16.3033009,9.69669914 C17.6605339,11.0539322 18.5,12.9289322 18.5,15 L18.5,15 L18.5,39 C18.5,41.0710678 17.6605339,42.9460678 16.3033009,44.3033009 C14.9460678,45.6605339 13.0710678,46.5 11,46.5 L11,46.5 L-0.5,46.5 L-0.5,7.5 Z" stroke-linejoin="square" fill="#FFFFFF" fill-rule="evenodd"></path>
+                    </g>
+                </g>
+                <path d="M5.99820028,27.4408856 C6.0088436,27.3075619 6.076017,27.1796564 6.19331633,27.0957529 C6.21846256,27.0777659 6.24453193,27.0618564 6.27130755,27.0480049 L10.9822321,22.1934545 C11.2008445,21.9681578 11.5513528,21.9366082 11.8066837,22.1192448 C12.0178225,22.2702711 12.0665533,22.5638639 11.915527,22.7750027 C11.9019002,22.7940533 11.8868685,22.8120586 11.8705576,22.8288683 L7.338,27.5 L11.8705576,32.1711317 C11.8787131,32.1795365 11.8865487,32.1882403 11.8940489,32.1972242 L11.915527,32.2249973 C12.0665533,32.4361361 12.0178225,32.7297289 11.8066837,32.8807552 C11.5513528,33.0633918 11.2008445,33.0318422 10.9822321,32.8065455 L10.9822321,32.8065455 L6.27027807,27.9514614 C6.24386364,27.9377353 6.21814017,27.9220035 6.19331633,27.9042471 C6.076017,27.8203436 6.0088436,27.6924381 5.99820028,27.5591144 Z" id="btn_zk" fill="#425170" transform="translate(9.000000, 27.500000) scale(-1, -1) translate(-9.000000, -27.500000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -181,8 +181,15 @@ Blockly.BlockDragger.prototype.startBlockDrag = function(currentDragDeltaXY) {
 
   var toolbox = this.workspace_.getToolbox();
   if (toolbox) {
-    var style = this.draggingBlock_.isDeletable() ? 'blocklyToolboxDelete' :
-        'blocklyToolboxGrab';
+    var style = '';
+
+    if (this.draggingBlock_.isDeletable()) {
+      style = 'blocklyToolboxDelete';
+      toolbox.showMxcTrash(); // 拖拽积木时，显示垃圾桶标识
+    } else {
+      style = 'blocklyToolboxGrab';
+    }
+
     toolbox.addStyle(style);
   }
 };
@@ -258,8 +265,14 @@ Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
 
   var toolbox = this.workspace_.getToolbox();
   if (toolbox) {
-    var style = this.draggingBlock_.isDeletable() ? 'blocklyToolboxDelete' :
-        'blocklyToolboxGrab';
+    var style = '';
+
+    if (this.draggingBlock_.isDeletable()) {
+      style = 'blocklyToolboxDelete';
+      toolbox.hideMxcTrash(); // 拖拽完积木后，隐藏垃圾桶标识
+    } else {
+      style = 'blocklyToolboxGrab';
+    }
     toolbox.removeStyle(style);
   }
   Blockly.Events.setGroup(false);
@@ -361,13 +374,23 @@ Blockly.BlockDragger.prototype.maybeDeleteBlock_ = function() {
 Blockly.BlockDragger.prototype.updateCursorDuringBlockDrag_ = function(isOutside) {
   this.wouldDeleteBlock_ = this.draggedConnectionManager_.wouldDeleteBlock();
   var trashcan = this.workspace_.trashcan;
+  var toolbox = this.workspace_.getToolbox(); // 引入 toolbox，用来调用显示、隐藏垃圾桶的接口函数
+
   if (this.wouldDeleteBlock_) {
     this.draggingBlock_.setDeleteStyle(true);
+
+    if (toolbox) {
+      toolbox.openMxcTrash(); // 显示垃圾桶
+    }
     if (this.deleteArea_ == Blockly.DELETE_AREA_TRASH && trashcan) {
       trashcan.setOpen_(true);
     }
   } else {
     this.draggingBlock_.setDeleteStyle(false);
+
+    if (toolbox) {
+      toolbox.closeMxcTrash(); // 隐藏垃圾桶
+    }
     if (trashcan) {
       trashcan.setOpen_(false);
     }

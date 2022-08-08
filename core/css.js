@@ -1042,6 +1042,30 @@ Blockly.Css.CONTENT = [
     'cursor: pointer;',
   '}',
 
+  /* 可删除区域显示垃圾桶标识 */
+  '.mxcTrash {',
+    'display: none;',
+
+    'position: absolute;',
+    'top: 0;',
+    'left: 0;',
+    'z-index: 50;',
+
+    'width: 64px;',
+    'height: 100%;',
+
+    'background-image: url(<<<PATH>>>/trash.png);',
+    'background-repeat: no-repeat !important;',
+    'background-position: 50% 50%;',
+    'background-size: 34px;',
+
+    'background-color: rgba(0, 0, 0, .3);',
+  '}',
+  '.mxcTrash.mxcTrashOpen {',
+    'background-image: url(<<<PATH>>>/trash-open.png);',
+    'background-color: rgba(0, 0, 0, .5);',
+  '}',
+
   /* Copied from: goog/css/menu.css */
   /*
    * Copyright 2009 The Closure Library Authors. All Rights Reserved.

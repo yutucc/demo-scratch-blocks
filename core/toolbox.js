@@ -156,6 +156,7 @@ Blockly.Toolbox.prototype.init = function() {
   this.position();
 
   this.createTrigger(); // 创建隐藏 flyout 的按钮
+  this.createMxcTrash(); // 创建可删除区域，显示垃圾桶的标志
 
   // 给 “显示、隐藏 flyout 的按钮” 添加点击事件
   // FIXME: 不知道为什么，这里如果换成绑定 mousedown 事件的话，在移动端会无法点击，也无法执行回调函数
@@ -234,6 +235,44 @@ Blockly.Toolbox.prototype.setIsHideFlyout = function(isHideFlyout_) {
  */
 Blockly.Toolbox.prototype.triggerIsHideFlyout = function() {
   this.isHideFlyout_ = !this.isHideFlyout_;
+};
+
+/**
+ * 创建一个垃圾桶（删除积木）显示标识
+ */
+ Blockly.Toolbox.prototype.createMxcTrash = function() {
+  var trash = goog.dom.createDom(goog.dom.TagName.DIV, 'mxcTrash');
+
+  this.HtmlDiv.parentNode.insertBefore(trash, this.HtmlDiv);
+  this.trash_ = trash;
+};
+
+/**
+ * 显示垃圾桶的图标
+ */
+Blockly.Toolbox.prototype.showMxcTrash = function() {
+  this.trash_.style.display = 'block';
+};
+
+/**
+ * 隐藏垃圾桶的图标
+ */
+Blockly.Toolbox.prototype.hideMxcTrash = function() {
+  this.trash_.style.display = 'none';
+};
+
+/**
+ * 拖动积木到可删除区域时，显示打开垃圾桶的图标
+ */
+Blockly.Toolbox.prototype.openMxcTrash = function() {
+  Blockly.utils.addClass(/** @type {!Element} */ (this.trash_), 'mxcTrashOpen');
+};
+
+/**
+ * 拖动积木到不可删除区域时，显示关闭垃圾桶的图标
+ */
+Blockly.Toolbox.prototype.closeMxcTrash = function() {
+  Blockly.utils.removeClass(/** @type {!Element} */ (this.trash_), 'mxcTrashOpen');
 };
 
 /**

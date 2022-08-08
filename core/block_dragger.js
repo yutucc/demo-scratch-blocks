@@ -380,7 +380,7 @@ Blockly.BlockDragger.prototype.updateCursorDuringBlockDrag_ = function(isOutside
     this.draggingBlock_.setDeleteStyle(true);
 
     if (toolbox) {
-      toolbox.openMxcTrash(); // 显示垃圾桶
+      toolbox.openMxcTrash(); // 拖动到可删除区域时，打开垃圾桶
     }
     if (this.deleteArea_ == Blockly.DELETE_AREA_TRASH && trashcan) {
       trashcan.setOpen_(true);
@@ -389,7 +389,7 @@ Blockly.BlockDragger.prototype.updateCursorDuringBlockDrag_ = function(isOutside
     this.draggingBlock_.setDeleteStyle(false);
 
     if (toolbox) {
-      toolbox.closeMxcTrash(); // 隐藏垃圾桶
+      toolbox.closeMxcTrash(); // 不在可删除区域时，关闭垃圾桶
     }
     if (trashcan) {
       trashcan.setOpen_(false);

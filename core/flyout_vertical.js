@@ -170,8 +170,9 @@ Blockly.VerticalFlyout.prototype.createDom = function(tagName) {
         'x': '0'
       },
       clipPath);
-  this.workspace_.svgGroup_.setAttribute(
-      'clip-path', 'url(#blocklyBlockMenuClipPath)');
+  // 不用裁剪的方式隐藏太长的积木块，改用当鼠标悬浮在 flyout 时，显示太长被挡住的积木（css.js 中的 .blocklyFlyout:hover）
+  // this.workspace_.svgGroup_.setAttribute(
+  //     'clip-path', 'url(#blocklyBlockMenuClipPath)');
 
   return this.svgGroup_;
 };

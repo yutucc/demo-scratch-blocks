@@ -492,6 +492,10 @@ Blockly.Css.CONTENT = [
     'position: absolute;',
     'z-index: 20;',
   '}',
+  // 鼠标悬浮在 flyout 区域时，显示因太长而被裁剪掉的积木
+  '.blocklyFlyout:hover {',
+    'overflow: visible;',
+  '}',
   '.blocklyFlyoutButton {',
     'fill: none;',
     'pointer-events: all;',

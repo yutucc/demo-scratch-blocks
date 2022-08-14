@@ -43,6 +43,7 @@ goog.require('goog.asserts');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
 
+goog.require('Blockly.Authority');
 
 /**
  * Class for a block's SVG representation.
@@ -673,13 +674,46 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
   // Save the current block in a variable for use in closures.
   var block = this;
   var menuOptions = [];
-  if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
-    menuOptions.push(
-        Blockly.ContextMenu.blockDuplicateOption(block, e));
-    if (this.isEditable() && this.workspace.options.comments) {
-      menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
+  var isHadLockAuth = Blockly.role.verifyAuth(Blockly.Authority.lock);
+  var isHadInvisibleAuth = Blockly.role.verifyAuth(Blockly.Authority.invisible);
+  // if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
+  //   menuOptions.push(
+  //       Blockly.ContextMenu.blockDuplicateOption(block, e));
+  //   if (this.isEditable() && this.workspace.options.comments) {
+  //     menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
+  //   }
+  //   menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
+  // } else if (this.parentBlock_ && this.isShadow_) {
+  //   this.parentBlock_.showContextMenu_(e);
+  //   return;
+  // }
+
+   // 根据角色权限以及功能之间的关系，修改积木右键菜单按钮。右键功能逻辑关系：https://res.miaocode.com/slim/Snipaste_2022-05-24_17-32-31-1653384778561.png
+  if (!block.isInFlyout) {
+    if (!block.isLocking() && !block.isInvisible()) {
+      menuOptions.push(Blockly.ContextMenu.blockDuplicateOption(block, e)); // 复制
+      menuOptions.push(Blockly.ContextMenu.blockCommentOption(block)); // 添加注释
+
+      if (block.isDeletable()) {
+        menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block)); // 删除
+      }
+
+      menuOptions.push(Blockly.ContextMenu.blockDeletableOption(block)); // 禁止删除
+
+      if (isHadLockAuth) {
+        menuOptions.push(Blockly.ContextMenu.blockLockingOption(block)); // 完全锁定
+      }
+      if (isHadInvisibleAuth) {
+        menuOptions.push(Blockly.ContextMenu.blockInvisibleOption(block)); // 隐藏积木
+      }
+    } else {
+      if (isHadLockAuth && block.isLocking()) {
+        menuOptions.push(Blockly.ContextMenu.blockLockingOption(block));
+      }
+      if (isHadInvisibleAuth && block.isInvisible()) {
+        menuOptions.push(Blockly.ContextMenu.blockInvisibleOption(block));
+      }
     }
-    menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
   } else if (this.parentBlock_ && this.isShadow_) {
     this.parentBlock_.showContextMenu_(e);
     return;

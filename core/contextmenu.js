@@ -516,4 +516,65 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
   return wsCommentOption;
 };
 
+/**
+ * 禁止删除/允许删除
+ */
+ Blockly.ContextMenu.blockDeletableOption = function(block) {
+  return {
+    text: block.isDeletable() ? Blockly.Msg.PREVENT_DELETION : Blockly.Msg.ALLOW_DELETION,
+    enabled: true,
+    callback: function () {
+      Blockly.Events.setGroup(true);
+      Blockly.Events.fire(
+          new Blockly.Events.BlockChange(
+              block,
+              'deletable',
+              'deletable',
+              block.isDeletable(),
+              !block.isDeletable()
+          )
+      );
+
+      block.menuSetDeletable(!block.isDeletable());
+
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
+/**
+ * 完全锁定/解除锁定
+ */
+ Blockly.ContextMenu.blockLockingOption = function(block) {
+  return {
+    text: !block.isLocking() ? Blockly.Msg.LOCK : Blockly.Msg.UNLOCK,
+    enabled: true,
+    callback: function () {
+      Blockly.Events.setGroup(true);
+
+      block.menuSetLocking(!block.isLocking());
+
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
+/**
+ * 隐藏积木/显示积木
+ */
+ Blockly.ContextMenu.blockInvisibleOption = function(block) {
+  return {
+    text: !block.isInvisible() ? Blockly.Msg.INVISIBLE : Blockly.Msg.VISIBLE,
+    enabled: true,
+    callback: function () {
+      Blockly.Events.setGroup(true);
+
+
+      block.menuSetInvisible(!block.isInvisible());
+
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
 // End helper functions for creating context menu options.

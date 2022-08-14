@@ -251,6 +251,14 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
     element.setAttribute('editable', false);
   }
 
+  // 添加“完全锁定”、“隐藏积木”两种状态的标识
+  if (block.isLocking()) {
+    element.setAttribute('isLocking', true);
+  }
+  if (block.isInvisible()) {
+    element.setAttribute('isInvisible', true);
+  }
+
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
     var container = goog.dom.createDom('next', null,
@@ -799,8 +807,10 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
     block.setDisabled(disabled == 'true' || disabled == 'disabled');
   }
   var deletable = xmlBlock.getAttribute('deletable');
-  if (deletable) {
-    block.setDeletable(deletable == 'true');
+  if (deletable && deletable != 'undefined') {
+    // block.setDeletable(deletable == 'true');
+    // 兼容出现禁止删除的 icon 的情况， 使用 menuSetDeletable 函数设置禁止删除的状态
+    block.menuSetDeletable(deletable == 'true');
   }
   var movable = xmlBlock.getAttribute('movable');
   if (movable) {
@@ -823,6 +833,19 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
     }
     block.setShadow(true);
   }
+
+  // 根据“完全锁定”状态标识，调用对应逻辑
+  var isLocking = xmlBlock.getAttribute('isLocking');
+  if (isLocking && isLocking != 'undefined') {
+    block.setLocking(isLocking == 'true');
+  }
+
+  // 根据“隐藏积木”状态标识，调用对应逻辑
+  var isInvisible = xmlBlock.getAttribute('isInvisible');
+  if (isInvisible && isInvisible != 'undefined') {
+    block.setInvisible(isInvisible == 'true');
+  }
+
   return block;
 };
 

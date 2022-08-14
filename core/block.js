@@ -136,6 +136,15 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {string|Blockly.Comment} */
   this.comment = null;
 
+  /** @type {string|Blockly.PreventDeletion} 禁止删除 icon */
+  this.preventDeletion = null;
+
+  /** @type {string|Blockly.Locking} 完全锁定 icon */
+  this.locking = null;
+
+  /** @type {string|Blockly.Invisible} 隐藏积木 icon */
+  this.invisible = null;
+
   /**
    * @type {?number}
    * @private
@@ -621,6 +630,192 @@ Blockly.Block.prototype.setDeletable = function(deletable) {
 };
 
 /**
+ * 为什么不直接复用 setDeletable 函数？
+ *    - 虽然我们控制能否被删除的逻辑还是复用 this.deletable_
+ *    - 但，只有通过积木右键菜单栏手动点击的情况(或者通过读取工程文件中的数据)才会出现“禁止删除”的标识，即：this.preventDeletion
+ * @param {Boolean} deletable true: 能删除； false: 不能删除
+ */
+Blockly.Block.prototype.menuSetDeletable = function(deletable) {
+  if (deletable) {
+    // 积木能被删除，则检查一下标记禁止删除的标识是否存在，如果有，就销毁它
+    if (this.preventDeletion) {
+      this.preventDeletion.dispose();
+    }
+  } else {
+    if (!this.preventDeletion) {
+      this.preventDeletion = new Blockly.PreventDeletion(this);
+    }
+  }
+
+  this.setDeletable(deletable);
+};
+
+/**
+ * 获取当前积木 isLocking 状态
+ * @return {boolean}
+ */
+Blockly.Block.prototype.isLocking = function() {
+  return this.isLocking_;
+};
+
+/**
+ * 设置当前积木 isLocking 状态
+ * @param {boolean} isLocking 完全锁定：true；解除锁定：false
+ */
+Blockly.Block.prototype.setLocking = function(isLocking) {
+  if (isLocking) {
+    // 显示锁定 icon 时，不需要再显示禁止删除的 icon
+    if (this.preventDeletion) {
+      this.preventDeletion.dispose();
+    }
+
+    if (!this.locking) {
+      this.locking = new Blockly.Locking(this);
+    }
+  } else {
+    if (this.locking) {
+      this.locking.dispose();
+    }
+  }
+
+  this.isLocking_ = isLocking;
+
+  // 修改 锁定状态 的同时，要修改能否移动、能否删除、能否编辑，这几个状态
+  this.setMovable(!isLocking);
+  this.setDeletable(!isLocking);
+  this.setBlocksEditable(!isLocking);
+}
+
+/**
+ * 通过积木右键菜单栏的按钮，设置锁定状态
+ * @param {boolean} isLocking 完全锁定：true；解除锁定：false
+ *    递归查找并设置当前积木的 child 以及与其连接在一起的积木块
+ */
+Blockly.Block.prototype.menuSetLocking = function(isLocking) {
+  var children = this.getChildren();
+  var nextBlock = this.getNextBlock();
+  var isProcedures = this.type && this.type.includes && this.type.includes('procedures');
+
+  /* 有 this.getCategory() 说明不是类似的 input 的积木，可以设置锁定状态，具体说明如图：https://res.miaocode.com/slim/Snipaste_2022-05-24_17-46-00-1653385600566.png
+  另外，对于自定义积木，category_ 为 null，只能根据 type 来判断，具体可见：
+  https://res.miaocode.com/slim/Snipaste_2022-06-10_12-12-09-1654834390413.png
+  https://res.miaocode.com/slim/Snipaste_2022-06-10_12-12-44-1654834399658.png */
+  if (this.getCategory() || isProcedures) {
+    this.setLocking(isLocking);
+
+    // 每个修改 锁定状态 的积木都要发起这个事件，将修改信息同步给 vm
+    Blockly.Events.fire(
+      new Blockly.Events.BlockChange(
+          this,
+          'locking',
+          'locking',
+          !isLocking,
+          isLocking
+      )
+    );
+  }
+
+  children.forEach((item) => {
+    item.menuSetLocking(isLocking);
+  });
+
+  if (nextBlock) {
+    nextBlock.menuSetLocking(isLocking);
+  }
+}
+
+/**
+ * 获取当前积木 isInvisible 状态
+ * @return {boolean}
+ */
+Blockly.Block.prototype.isInvisible = function() {
+  return this.isInvisible_;
+};
+
+/**
+ * 设置当前积木 setInvisible 状态
+ * @param {boolean} setInvisible 隐藏积木：true；显示积木：false
+ *    具体逻辑跟 setLocking 类似
+ *    多了一个逻辑：根据角色权限，控制隐藏的积木是否显示。
+ *        隐藏积木：true，当前角色有权限，积木显示在编辑区域，并且左上角出现 icon
+ *        隐藏积木：true，当前角色无权限，积木不出现在编辑区域
+ */
+Blockly.Block.prototype.setInvisible = function(invisible) {
+  var isHadInvisibleAuth = Blockly.role.verifyAuth(Blockly.Authority.invisible);
+
+  if (invisible) {
+    // 显示隐藏积木 icon 时，不需要再显示禁止删除的 icon
+    if (this.preventDeletion) {
+      this.preventDeletion.dispose();
+    }
+
+    if (!this.invisible) {
+      this.invisible = new Blockly.Invisible(this);
+    }
+  } else {
+    if (this.invisible) {
+      this.invisible.dispose();
+    }
+  }
+
+  this.isInvisible_ = invisible;
+
+  this.setMovable(!invisible);
+  this.setDeletable(!invisible);
+  this.setBlocksEditable(!invisible);
+
+  if (!isHadInvisibleAuth) {
+    this.setHidden(invisible);
+  }
+}
+
+/**
+ * 通过积木右键菜单栏的按钮，设置积木隐藏状态
+ * @param {boolean} isInvisible 隐藏积木：true；显示积木：false
+ *    递归查找并设置当前积木的 child 以及与其连接在一起的积木块
+ *    具体逻辑跟 menuSetLocking 类似
+ */
+Blockly.Block.prototype.menuSetInvisible = function(isInvisible) {
+  var children = this.getChildren();
+  var nextBlock = this.getNextBlock();
+  var isProcedures = this.type && this.type.includes && this.type.includes('procedures');
+
+  if (this.getCategory() || isProcedures) {
+    this.setInvisible(isInvisible);
+
+    Blockly.Events.fire(
+      new Blockly.Events.BlockChange(
+          this,
+          'invisible',
+          'invisible',
+          !isInvisible,
+          isInvisible
+      )
+    );
+  }
+
+  children.forEach((item) => {
+    item.menuSetInvisible(isInvisible);
+  });
+
+  if (nextBlock) {
+    nextBlock.menuSetInvisible(isInvisible);
+  }
+}
+
+/**
+ * 隐藏积木
+ * @return {boolean} true：隐藏；false：显示
+ */
+Blockly.Block.prototype.setHidden = function(isInvisible) {
+  if (isInvisible) {
+    this.svgGroup_.setAttribute('style', 'display : none;');
+  } else {
+    this.svgGroup_.setAttribute('style', 'display : block;');
+  }
+};
+
+/**
  * Get whether this block is movable or not.
  * @return {boolean} True if movable.
  */
@@ -697,6 +892,21 @@ Blockly.Block.prototype.setEditable = function(editable) {
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
       field.updateEditable();
     }
+  }
+};
+
+/**
+ * FIXME: 设置 block 以及其子孙 block 的 editable 状态
+ *    PS：没搞懂，为什么上面官方的 setEditable 只对block 立面的 input，设置editable 状态
+ *        试过，如果只是用上面官方的方法，没法做到让 block 中的 input 输入框处于不能编辑的状态
+ *        为了实现需求 + 不破坏原来的逻辑，重新开了一个函数出来
+ * @param {boolean} editable True if editable.
+ */
+Blockly.Block.prototype.setBlocksEditable = function(editable) {
+  this.editable_ = editable;
+
+  for (var i = 0, block; (block = this.childBlocks_[i]); i++) {
+    block.setEditable(editable);
   }
 };
 

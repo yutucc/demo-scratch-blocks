@@ -428,6 +428,10 @@ Blockly.Connection.prototype.canConnectToPrevious_ = function(candidate) {
  * @return {boolean} True if the connection is allowed, false otherwise.
  */
 Blockly.Connection.prototype.isConnectionAllowed = function(candidate) {
+  // 如果处于锁定状态或者隐藏状态，不能链接其它积木
+  if (candidate.sourceBlock_.isLocking() || candidate.sourceBlock_.isInvisible()) {
+    return false;
+  }
 
   // Don't consider insertion markers.
   if (candidate.sourceBlock_.isInsertionMarker()) {

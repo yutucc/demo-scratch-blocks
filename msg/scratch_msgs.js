@@ -5170,7 +5170,13 @@ Blockly.ScratchMsgs.locales["en"] =
     "NEW_BROADCAST_MESSAGE": "New message",
     "NEW_BROADCAST_MESSAGE_TITLE": "New message name:",
     "BROADCAST_MODAL_TITLE": "New Message",
-    "DEFAULT_BROADCAST_MESSAGE_NAME": "message1"
+    "DEFAULT_BROADCAST_MESSAGE_NAME": "message1",
+    "PREVENT_DELETION": "Prohibit to delete",
+    "ALLOW_DELETION": "Allowed to delete",
+    "LOCK": "Lock",
+    "UNLOCK": "Unlock",
+    "INVISIBLE": "Hide blocks",
+    "VISIBLE": "Show blocks",
 };
 
 Blockly.ScratchMsgs.locales["es"] =
@@ -20955,7 +20961,13 @@ Blockly.ScratchMsgs.locales["zh-cn"] =
     "NEW_BROADCAST_MESSAGE": "新消息",
     "NEW_BROADCAST_MESSAGE_TITLE": "新消息的名称：",
     "BROADCAST_MODAL_TITLE": "新消息",
-    "DEFAULT_BROADCAST_MESSAGE_NAME": "消息1"
+    "DEFAULT_BROADCAST_MESSAGE_NAME": "消息1",
+    "PREVENT_DELETION": "禁止删除",
+    "ALLOW_DELETION": "允许删除",
+    "LOCK": "完全锁定",
+    "UNLOCK": "解除锁定",
+    "INVISIBLE": "隐藏积木",
+    "VISIBLE": "显示积木",
 };
 
 Blockly.ScratchMsgs.locales["zh-tw"] =
@@ -21242,6 +21254,12 @@ Blockly.ScratchMsgs.locales["zh-tw"] =
     "NEW_BROADCAST_MESSAGE": "新的訊息",
     "NEW_BROADCAST_MESSAGE_TITLE": "新訊息的名稱",
     "BROADCAST_MODAL_TITLE": "新的訊息",
-    "DEFAULT_BROADCAST_MESSAGE_NAME": "message1"
+    "DEFAULT_BROADCAST_MESSAGE_NAME": "message1",
+    "PREVENT_DELETION": "禁止刪除",
+    "ALLOW_DELETION": "允許刪除",
+    "LOCK": "完全鎖定",
+    "UNLOCK": "解除鎖定",
+    "INVISIBLE": "隱藏積木",
+    "VISIBLE": "顯示積木",
 };
 // End of combined translations

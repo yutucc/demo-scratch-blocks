@@ -64,7 +64,8 @@
         document.forms.options.elements.side.value = side;
 
         match = location.search.match(/locale=([^&]+)/);
-        var locale = match ? match[1] : 'en';
+        // var locale = match ? match[1] : 'en';
+        var locale = match ? match[1] : 'zh-cn';
         Blockly.ScratchMsgs.setLocale(locale);
         document.forms.options.elements.locale.value = locale;
 
@@ -113,6 +114,8 @@
           state = sessionStorage.getItem('logFlyoutEvents');
           logFlyoutEvents(Boolean(state));
         }
+
+        Blockly.setRole('teacher');
       }
 
       function getToolboxElement() {

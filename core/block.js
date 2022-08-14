@@ -48,6 +48,12 @@ goog.require('goog.asserts');
 goog.require('goog.math.Coordinate');
 goog.require('goog.string');
 
+goog.require('Blockly.PreventDeletion');
+goog.require('Blockly.Locking');
+goog.require('Blockly.Invisible');
+
+goog.require('Blockly.Authority');
+
 
 /**
  * Class for one block.
